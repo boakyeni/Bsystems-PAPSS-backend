@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -o errexit
+
+set -o nounset
+
+watchmedo auto-restart -d papss_config/ -p "*.py" -- celery -A papss_config worker --loglevel=info
+

@@ -1,0 +1,80 @@
+{% load i18n %}
+
+{% block subject %}
+{% blocktrans %}{{ site_name }} - Your account has been successfully created and activated!{% endblocktrans %}
+{% endblock %}
+
+
+{% block html_body %}
+<div class="card-body">
+    <div class="col-12">
+        <table class="body-wrap"
+            style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; background-color: transparent; margin: 0;">
+            <tr
+                style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                <td style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+                    valign="top"></td>
+                <td class="container" width="600"
+                    style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; display: block !important; max-width: 600px !important; clear: both !important; margin: 0 auto;"
+                    valign="top">
+                    <div class="content"
+                        style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; max-width: 600px; display: block; margin: 0 auto; padding: 20px;">
+                        <table class="main" width="100%" cellpadding="0" cellspacing="0" itemprop="action"
+                            itemscope itemtype="http://schema.org/ConfirmAction"
+                            style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px; margin: 0; border: none;">
+                            <tr style="font-family: 'Roboto', sans-serif; font-size: 14px; margin: 0;">
+                                <td class="content-wrap"
+                                    style="font-family: 'Roboto', sans-serif; box-sizing: border-box; color: #495057; font-size: 14px; vertical-align: top; margin: 0;box-shadow: 0 3px 15px rgba(30,32,37,.06); ;border-radius: 7px; background-color: #fff;overflow: hidden;"
+                                    valign="top">
+                                    <meta itemprop="name" content="Confirm Email"
+                                        style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;" />
+                                    <div
+                                        style="padding: 20px;box-sizing: border-box; text-align: center; background-image: linear-gradient(to right,#ad0c0c, #ebcdcd);">
+                                        <img src="img/logo.png" alt="" height="44">
+                                    </div>
+                                    <div style="padding: 20px;box-sizing: border-box; text-align: center;">
+                                        <h2
+                                            style="font-family: 'Roboto', sans-serif;margin-bottom: 10px;font-weight: 500;">
+                                            TradePayAfrica</h2>
+                                        <p
+                                            style="font-size: 14px;color: #98a6ad;border-bottom: 1px solid #e9ebec;padding-bottom: 18px;">
+                                            Establishing Payment Connections & Boosting Trade in Africa</p>
+                                        <p
+                                            style="font-family: 'Roboto', sans-serif; font-size: 18px; font-weight: 500;">
+                                            Thank you for registering on the TradePayAfrica
+                                            Platform. Your dashboard is ready for use</p>
+                                        <a href="#" itemprop="url"
+                                            style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: .710rem;font-weight: 400; color: #FFF; text-decoration: none; text-align: center; cursor: pointer; display: inline-block; border-radius: .25rem; text-transform: capitalize; background-color: #0ab39c; margin: 0; border-color: #0ab39c; border-style: solid; border-width: 1px; padding: .25rem .5rem;"
+                                            onMouseOver="this.style.background='#099885'"
+                                            onMouseOut="this.style.background='#0ab39c'">Login Now
+                                            &#8594;</a>
+                                    </div>
+                                    <div
+                                        style="padding: 20px;box-sizing: border-box; text-align: center; background-color: rgba(240,101,72,.1);">
+                                        <h6
+                                            style="font-family: 'Roboto', sans-serif;margin: 0; font-size: 15px;text-transform: uppercase;color: #f06548;">
+                                            Call u <a style="color: #f06548;"
+                                                href="tel:+233(0)302 254340">+233(0)302 25434</a>
+                                        </h6>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                        <div style="text-align: center; margin: 28px auto 0px auto;">
+                            <p
+                                style="font-family: 'Roboto', sans-serif; font-size: 14px;color: #98a6ad; margin: 0px;">
+                                Please do not reply to this email. Emails sent to this address will not be
+                                answered</p>
+                            <p
+                                style="font-family: 'Roboto', sans-serif; font-size: 14px;color: #98a6ad; margin: 0px;">
+                                2023 Bsystems Ltd, 6 Eseefo Street, Asylum Down - Accra, Ghana. All rights
+                                reserved.
+                            </p>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% endblock html_body %}
