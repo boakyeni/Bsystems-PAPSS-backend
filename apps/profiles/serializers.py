@@ -71,6 +71,8 @@ class RepReturnSerializer(serializers.ModelSerializer):
 
 
 class ContactPersonSerializer(serializers.ModelSerializer):
+    profile_photo = Base64File()
+
     class Meta:
         model = ContactPerson
         fields = "__all__"
