@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Company, Rep, ContactPerson, Country
+from .models import Company, Rep, ContactPerson, Country, ProfileDocument
 
 
 # class ProfileAdmin(admin.ModelAdmin):
@@ -14,3 +14,4 @@ admin.site.register(Company)
 admin.site.register(Rep)
 admin.site.register(ContactPerson)
 admin.site.register(Country)
+admin.site.register(ProfileDocument)

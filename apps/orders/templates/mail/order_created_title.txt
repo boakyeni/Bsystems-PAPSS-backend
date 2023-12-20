@@ -1,0 +1,1 @@
+{% load i18n %}{% trans 'Order' %} {{ order }} - {% blocktrans with buyer=buyer user=user %} An order has been requested by {{ buyer }} to {{user}}{% endblocktrans %}

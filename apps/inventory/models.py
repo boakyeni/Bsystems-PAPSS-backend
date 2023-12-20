@@ -2,6 +2,12 @@ from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey, TreeManyToManyField
 from django.utils.translation import gettext_lazy as _
 from autoslug import AutoSlugField
+from apps.profiles.models import Company
+from django.utils.timezone import localdate, now
+from datetime import timedelta
+import requests
+from django.conf import settings
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 
@@ -13,19 +19,12 @@ class Category(MPTTModel):
 
     name = models.CharField(
         max_length=100,
-        null=False,
-        unique=False,
-        blank=False,
-        verbose_name=_("category name"),
         help_text=_("format: required, max-100"),
+        unique=True,
     )
-    slug = models.SlugField(
-        max_length=150,
-        null=False,
-        unique=False,
-        blank=False,
-        verbose_name=("category safe URL"),
-        help_text=_("format: required, letters, numbers, underscore, or hyphens"),
+    slug = AutoSlugField(
+        populate_from="name",
+        unique=True,
     )
     is_active = models.BooleanField(
         default=True,
@@ -41,6 +40,17 @@ class Category(MPTTModel):
         verbose_name=_("parent of category"),
         help_text=_("format: not required"),
     )
+    companies = models.ManyToManyField(Company, blank=True, related_name="categories")
+
+    description = models.TextField(blank=True, null=True)
+
+    def user_directory_path(instance, filename):
+        # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+        return "{0}/{1}".format("categories", filename)
+
+    category_image = models.FileField(
+        upload_to=user_directory_path, blank=True, null=True
+    )
 
     class MPTTMeta:
         order_insertion_by = ["name"]
@@ -50,11 +60,28 @@ class Category(MPTTModel):
         verbose_name_plural = _("Categories")
 
     def __str__(self):
-        return self.name
+        return str(self.name) if self.name else ""
+
+
+class ProductDocument(models.Model):
+    def user_directory_path(instance, filename):
+        # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+        filename = instance.name if instance.name else filename
+        return "user_{0}/{1}".format("main", filename)
+
+    name = models.CharField(
+        verbose_name=_("File Name"), blank=True, null=True, max_length=500
+    )
+    file = models.FileField(upload_to=user_directory_path, blank=True, null=True)
+    date_uploaded = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
 
 class ProductImage(models.Model):
-    image = models.ImageField(default="/interior_sample.jpg", null=True, blank=True)
+    def user_directory_path(instance, filename):
+        # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+        return "user_{0}/{1}".format("main", filename)
+
+    image = models.FileField(upload_to=user_directory_path, blank=True, null=True)
 
 
 class Product(models.Model):
@@ -64,13 +91,12 @@ class Product(models.Model):
 
     name = models.CharField(
         max_length=255,
-        null=False,
-        unique=False,
-        blank=False,
         verbose_name=_("product name"),
         help_text=_("format: required, max-255"),
     )
+    seller = models.ForeignKey(Company, blank=True, null=True, on_delete=models.CASCADE)
     slug = AutoSlugField(populate_from="name", unique=True)
+    sku = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(
         unique=False,
         null=False,
@@ -78,7 +104,7 @@ class Product(models.Model):
         verbose_name=_("product description"),
         help_text=_("format: required"),
     )
-    categories = TreeManyToManyField(Category)
+    categories = TreeManyToManyField(Category, blank=True)
     is_active = models.BooleanField(
         unique=False,
         null=False,
@@ -99,14 +125,68 @@ class Product(models.Model):
         verbose_name=_("date product last updated"),
         help_text=_("format: Y-m-d H:M:S"),
     )
+    weight = models.CharField(max_length=20, blank=True, null=True)
+    cost = models.DecimalField(decimal_places=2, default="0.00", max_digits=20)
 
     def user_directory_path(instance, filename):
-        print(instance.file_uuid, "here")
         # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-        return "user_{0}/{1}".format(instance.user.id, filename)
+        return "user_{0}/{1}".format("main", filename)
 
     brochure = models.FileField(upload_to=user_directory_path, blank=True, null=True)
     images = models.ManyToManyField(ProductImage, blank=True, related_name="product")
+    documents = models.ManyToManyField(
+        ProductDocument, blank=True, related_name="product"
+    )
 
     def __str__(self):
-        return self.name
+        return str(self.name) if self.name else ""
+
+
+class CurrencyRates(models.Model):
+    currency_rate_timestamp = models.DateTimeField()
+    ghs = models.FloatField(default=1.0, blank=True, null=True)
+    xof = models.FloatField(default=1.0, blank=True, null=True)
+    xaf = models.FloatField(default=1.0, blank=True, null=True)
+    ngn = models.FloatField(default=1.0, blank=True, null=True)
+    eur = models.FloatField(default=1.0, blank=True, null=True)
+    usd = models.FloatField(default=1.0, blank=True, null=True)
+
+    @property
+    def rates(self):
+        if self.currency_rate_timestamp + timedelta(hours=1) < now():
+            try:
+                response = requests.get(
+                    "http://api.exchangeratesapi.io/v1/latest",
+                    params={
+                        "access_key": settings.EXCHANGE_RATE_API_KEY,
+                        "symbols": "GHS,XOF,NGN,USD,LRD,GMD,CVE,GNF,MRU,XAF,CDF,AOA,RWF,BIF,STN,ZAR,NAD,BWP,KES",
+                    },
+                )
+                data = response.json()
+                if data.get("success"):
+                    self.ghs = data["rates"].get("GHS", self.ghs)
+                    self.xof = data["rates"].get("XOF", self.xof)
+                    self.ngn = data["rates"].get("NGN", self.ngn)
+                    self.xaf = data["rates"].get("XAF", self.xaf)
+                    self.eur = data["rates"].get("EUR", self.eur)
+                    self.usd = data["rates"].get("USD", self.usd)
+                    self.currency_rate_timestamp = now()
+                    self.save()
+                    return data["rates"]
+            except requests.RequestException as e:
+                # Handle request exceptions (e.g., network issues)
+                pass
+        return {
+            "GHS": self.ghs,
+            "XOF": self.xof,
+            "NGN": self.ngn,
+            "XAF": self.xaf,
+            "EUR": self.eur,
+            "USD": self.usd,
+        }
+
+    def save(self, *args, **kwargs):
+        if not self.pk and CurrencyRates.objects.exists():
+            # If you're trying to create a new instance and one already exists
+            raise ValidationError("There is can be only one CurrentRates instance")
+        return super(CurrencyRates, self).save(*args, **kwargs)

@@ -32,6 +32,7 @@ DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(" ")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS").split(" ")
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(" ")
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # Application definition
@@ -57,6 +58,7 @@ LOCAL_APPS = [
     "apps.users",
     "apps.profiles",
     "apps.inventory",
+    "apps.orders",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -108,11 +110,11 @@ PHONENUMBER_DEFAULT_REGION = "GH"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = env("EMAIL_HOST")
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = env("EMAIL_USE_TLS")
 EMAIL_PORT = env("EMAIL_PORT")
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = "no-reply@bsystems.com"
+DEFAULT_FROM_EMAIL = "TradePayAfrica <info@tradepayafrica.com>"
 SITE_NAME = "TradePayAfrica"
 
 # Password validation
@@ -145,12 +147,15 @@ USE_I18N = True
 
 USE_TZ = True
 
+EXCHANGE_RATE_API_KEY = env("EXCHANGE_RATE_API_KEY")
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/staticfiles/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = "/var/www/PAPSS-backend-static/static"
 STATICFILES_DIR = []
 MEDIA_URL = "/mediafiles/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
@@ -181,7 +186,7 @@ SIMPLE_JWT = {
         "Bearer",
         "JWT",
     ),
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=180),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
     "SIGNING_KEY": env("SIGNING_KEY"),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
@@ -207,6 +212,8 @@ DJOSER = {
     },
     "EMAIL": {
         "confirmation": "apps.users.email.ConfirmationEmail",
+        "password_reset": "apps.users.email.PasswordResetEmail",
+        "password_changed_confirmation": "apps.users.email.PasswordChangedConfirmationEmail",
     },
 }
 

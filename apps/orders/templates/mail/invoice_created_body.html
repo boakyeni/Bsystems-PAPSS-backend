@@ -1,11 +1,4 @@
-{% load i18n %}
-
-{% block subject %}
-{% blocktrans %}{{ site_name }} - Your account has been successfully created and activated!{% endblocktrans %}
-{% endblock %}
-
-
-{% block html_body %}
+{% load i18n %}{% block html_body %}
 <div class="card-body">
     <div class="col-12">
         <table class="body-wrap"
@@ -41,19 +34,18 @@
                                             Establishing Payment Connections & Boosting Trade in Africa</p>
                                         <p
                                             style="font-family: 'Roboto', sans-serif; font-size: 18px; font-weight: 500;">
-                                            Thank you for registering on the TradePayAfrica
-                                            Platform. Temporary Password: {{user.registration_code}}</p>
-                                        <a href="https://admin.tradepayafrica.com/#/login" itemprop="url"
+                                            {% blocktrans %}We are writing to inform you, that a(n) {{ invoice_type }} has been issued. You can view it by clicking the button below:{% endblocktrans %}</p>
+                                        <a href="#" itemprop="url"
                                             style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: .710rem;font-weight: 400; color: #FFF; text-decoration: none; text-align: center; cursor: pointer; display: inline-block; border-radius: .25rem; text-transform: capitalize; background-color: #0ab39c; margin: 0; border-color: #0ab39c; border-style: solid; border-width: 1px; padding: .25rem .5rem;"
                                             onMouseOver="this.style.background='#099885'"
-                                            onMouseOut="this.style.background='#0ab39c'">Login Now
+                                            onMouseOut="this.style.background='#0ab39c'">See Invoice
                                             &#8594;</a>
                                     </div>
                                     <div
                                         style="padding: 20px;box-sizing: border-box; text-align: center; background-color: rgba(240,101,72,.1);">
                                         <h6
                                             style="font-family: 'Roboto', sans-serif;margin: 0; font-size: 15px;text-transform: uppercase;color: #f06548;">
-                                            Call us <a style="color: #f06548;"
+                                            Call u <a style="color: #f06548;"
                                                 href="tel:+233(0)302 254340">+233(0)302 25434</a>
                                         </h6>
                                     </div>

@@ -27,6 +27,8 @@ from django.contrib.auth import (
     logout,
 )
 from djoser.serializers import SetPasswordRetypeSerializer
+from apps.inventory.serializers import CategorySerializer
+from apps.inventory.models import Category
 
 
 # Create your views here.
@@ -64,6 +66,9 @@ class UserLogin(APIView):
 @api_view(["POST"])
 @transaction.atomic
 def register(request):
+    """
+    Check email for prior user then link account to company admin
+    """
     data = request.data
 
     registration_code = "".join(
@@ -83,6 +88,7 @@ def register(request):
 
     # Create Rep or Company
     if data["user_type"] == "REP":
+        # Create Rep Object
         rep_serializer = RepCreateSerializer(data=data)
         rep_serializer.is_valid(raise_exception=True)
         rep_instance = rep_serializer.save()
@@ -97,13 +103,21 @@ def register(request):
         contact_data["last_name"] = data.pop("last_name")
         contact_data["email"] = email_to
         contact_data["phone"] = data.pop("contact_phone")
+
         # countries = data.pop("countries")
         company_serializer = CompanyCreateSerializer(data=data)
         company_serializer.is_valid(raise_exception=True)
         company_instance = company_serializer.save()
 
+        if "categories" in data:
+            for category in data["categories"]:
+                category_instance_set = Category.objects.filter(name=category)
+                if len(category_instance_set) > 0:
+                    category_instance_set[0].companies.add(company_instance)
+                    category_instance_set[0].save()
+
         # for country in countries:
-        #     stored_country = Country.objects.filter(country=country)
+        #     stored_country = Country.objects.filter(country__name=country)
         #     if len(stored_country) > 0:
         #         stored_country[0].companies.add(company_instance)
         #         stored_country[0].save()

@@ -41,11 +41,11 @@ class User(AbstractUser):
         verbose_name_plural = "Users"
 
     def __str__(self):
-        return self.email
+        return str(self.email) if self.email else ""
 
     # def __str__(self):
     #     return f"{self.first_name} {self.last_name}"
 
-    # @property
-    # def get_full_name(self):
-    #     return f"{self.first_name} {self.last_name}"
+    @property
+    def get_full_name(self):
+        return f"{self.name}"

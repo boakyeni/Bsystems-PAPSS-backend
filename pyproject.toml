@@ -31,6 +31,9 @@ python-magic = "^0.4.27"
 watchdog = "^3.0.0"
 django-autoslug = "^1.9.9"
 setuptools = "^68.2.2"
+gunicorn = "^21.2.0"
+fuzzywuzzy = "^0.18.0"
+python-levenshtein = "^0.23.0"
 
 
 [build-system]

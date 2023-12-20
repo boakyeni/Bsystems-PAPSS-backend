@@ -5,6 +5,7 @@ import magic
 class Base64File(Base64FileField):
     """
     encodes Files as base 64 and checks mime
+    This is a custom field for DRF Serializers not for models
     """
 
     ALLOWED_TYPES = ["pdf", "jpg", "jpeg", "png"]
