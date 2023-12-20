@@ -103,7 +103,8 @@ def register(request):
         contact_data["last_name"] = data.pop("last_name")
         contact_data["email"] = email_to
         contact_data["phone"] = data.pop("contact_phone")
-        contact_data["profile_photo"] = data.pop("profile_photo", None)
+        if "profile_photo" in data:
+            contact_data["profile_photo"] = data.pop("profile_photo")
 
         # countries = data.pop("countries")
         company_serializer = CompanyCreateSerializer(data=data)
