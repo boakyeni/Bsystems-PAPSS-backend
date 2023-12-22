@@ -8,4 +8,5 @@ urlpatterns = [
     path("reps/", views.SearchForRep.as_view(), name="search_for_rep"),
     path("my-companies/", views.get_users_companies, name="get_users_companies"),
     path("upload/", views.upload_document, name="upload_document"),
+    path("delete-documents/", views.delete_document, name="delete_document"),
 ]

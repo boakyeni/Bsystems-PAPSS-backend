@@ -71,15 +71,13 @@ def get_number_of_reps(request):
 @permission_classes([permissions.IsAuthenticated])
 def get_users_companies(request):
     data = request.data
-
     user = request.user
-
-    if not user.contactperson:
+    if not user.admin_profile:
         return Response(
             {"error": "Can't do this as a rep"}, status=status.HTTP_204_NO_CONTENT
         )
     serializer = CompanySearchSerializer(
-        data=user.contactperson.companies.all(), many=True
+        data=user.admin_profile.companies.all(), many=True
     )
     serializer.is_valid()
     return Response(serializer.data)
