@@ -201,6 +201,26 @@ class CreateCategory(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+@api_view(["PATCH"])
+@transaction.atomic
+def edit_category(request):
+    data = request.data
+    try:
+        category_instance = Category.objects.get(name=data["name"])
+    except Category.DoesNotExist:
+        custom_response_data = {
+            # customize your response format here
+            "errors": "Category not found",
+            "status": "failed",
+            "message": "Category of the name requested as parent category does not exist",
+        }
+        return Response(custom_response_data, status=status.HTTP_400_BAD_REQUEST)
+    serializer = CategorySerializer(instance=category_instance, partial=True, data=data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 @api_view(["GET"])
 @transaction.atomic
 def get_currency_rates(request):

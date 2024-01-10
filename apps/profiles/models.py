@@ -43,6 +43,7 @@ class Company(models.Model):
         default="GH",
         blank_label="Country",
     )
+    is_active = models.BooleanField(default=True)
 
     def user_directory_path(instance, filename):
         # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>

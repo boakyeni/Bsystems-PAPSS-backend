@@ -3,6 +3,7 @@ from rest_framework import generics, filters, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from .models import Company, Rep, ProfileDocument, ContactPerson
+from django.db import transaction
 from .serializers import (
     CompanySearchSerializer,
     RepCreateSerializer,
@@ -40,6 +41,30 @@ class SearchForCompany(generics.ListAPIView):
         else:
             queryset = Company.objects.all()
         return queryset
+
+
+@api_view(["PATCH"])
+@transaction.atomic
+def update_company(request):
+    data = request.data
+    try:
+        company_instance = Company.objects.get(id=data["id"])
+    except Company.DoesNotExist:
+        return Response(
+            {
+                "error": "No company with this ID",
+                "status": "failed",
+                "message": "No company Found",
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    # company_instance.categories.add()
+    serializer = CompanySearchSerializer(
+        instance=company_instance, data=data, partial=True
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class SearchForRep(generics.ListAPIView):
