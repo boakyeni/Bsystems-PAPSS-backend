@@ -78,8 +78,12 @@ class ContactPersonSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+"""Write Serializer"""
+
+
 class CompanyCreateSerializer(serializers.ModelSerializer):
     profile_logo = Base64File(required=False)
+    business_certificate = Base64File(required=False)
 
     class Meta:
         model = Company
@@ -94,10 +98,14 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     #     User.objects.create()
 
 
+"""Read Serializer"""
+
+
 class CompanySearchSerializer(serializers.ModelSerializer):
     categories = serializers.SerializerMethodField()
     countries = CountryFullNameField()
     profile_logo = serializers.SerializerMethodField()
+    business_certificate = serializers.SerializerMethodField()
 
     class Meta:
         model = Company
@@ -110,6 +118,13 @@ class CompanySearchSerializer(serializers.ModelSerializer):
         return (
             "https://www.tradepayafrica.com" + obj.profile_logo.url
             if obj.profile_logo
+            else ""
+        )
+
+    def get_business_certificate(self, obj):
+        return (
+            "https://www.tradepayafrica.com" + obj.business_certificate.url
+            if obj.business_certificate
             else ""
         )
 

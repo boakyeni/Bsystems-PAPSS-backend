@@ -9,4 +9,5 @@ urlpatterns = [
     path("my-companies/", views.get_users_companies, name="get_users_companies"),
     path("upload/", views.upload_document, name="upload_document"),
     path("delete-documents/", views.delete_document, name="delete_document"),
+    path("edit-company/", views.update_company, name="edit-company"),
 ]
