@@ -48,8 +48,9 @@ class SearchForCompany(generics.ListAPIView):
 @transaction.atomic
 def update_company(request):
     data = request.data
+    comp_id = data.get("id", None) or request.query_params.get("id")
     try:
-        company_instance = Company.objects.get(id=data["id"])
+        company_instance = Company.objects.get(id=comp_id)
     except Company.DoesNotExist:
         return Response(
             {
