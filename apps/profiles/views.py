@@ -88,6 +88,9 @@ class SearchForRep(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = Rep.objects.all()
+        rep_id = self.request.query_params.get("id")
+        if rep_id:
+            queryset = Rep.objects.filter(id=rep_id)
         return queryset
 
 

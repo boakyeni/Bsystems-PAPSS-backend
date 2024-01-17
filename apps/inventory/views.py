@@ -39,12 +39,15 @@ class SearchProduct(generics.ListAPIView):
     def get_queryset(self):
         queryset = Product.objects.all()
         product_id = self.request.query_params.get("id")
+        company_id = self.request.query_params.get("company_id")
         if product_id:
             product = Product.objects.filter(id=product_id)
             if len(product) > 0:
                 queryset = product
             else:
                 queryset = []
+        elif company_id:
+            queryset = Product.objects.filter(seller=company_id)
         return queryset
 
 

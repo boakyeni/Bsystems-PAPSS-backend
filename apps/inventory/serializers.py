@@ -68,6 +68,8 @@ class ProductReturnSerializer(serializers.ModelSerializer):
             for document in obj.documents.all()
         ]
 
+    # Not fully stable, shouldn't be a problem though if database is backed up
+    # Could wrap get in a try catch, and then make a call to get currency endpoint, to make stable
     def get_rates(self, obj):
         currency_instance = CurrencyRates.objects.get()
         serializer = CurrencyRatesSerializer(instance=currency_instance)
