@@ -10,12 +10,13 @@ from .serializers import (
     ProductDocumentSerializer,
     CategoryReturnSerializer,
 )
-from .models import Product, Category, CurrencyRates, Company
+from .models import Product, Category, CurrencyRates, Company, ProductViews
 from rest_framework.response import Response
 from django.db import transaction
 from rest_framework.views import APIView
 from django.utils.timezone import now
 from datetime import timedelta
+from django.db.models import Count
 
 # Create your views here.
 
@@ -40,14 +41,30 @@ class SearchProduct(generics.ListAPIView):
         queryset = Product.objects.all()
         product_id = self.request.query_params.get("id")
         company_id = self.request.query_params.get("company_id")
+        top = self.request.query_params.get("top")
         if product_id:
             product = Product.objects.filter(id=product_id)
             if len(product) > 0:
-                queryset = product
-            else:
-                queryset = []
+                # Update views and prevent spam views
+                x_forwarded_for = self.request.META.get("HTTP_X_FORWARDED_FOR")
+                if x_forwarded_for:
+                    ip = x_forwarded_for.split(",")[0]
+                else:
+                    ip = self.request.META.get("REMOTE_ADDR")
+
+                if not ProductViews.objects.filter(product=product[0], ip=ip).exists():
+                    ProductViews.objects.create(product=product[0], ip=ip)
+
+                    product[0].views += 1
+                    product[0].save()
+
+            queryset = product
         elif company_id:
             queryset = Product.objects.filter(seller=company_id)
+            print("here1")
+        elif top:
+            queryset = Product.objects.all().order_by("-views")
+            print("here2")
         return queryset
 
 
@@ -171,6 +188,11 @@ class SearchCategories(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = Category.objects.all()
+        top = self.request.query_params.get("top")
+        if top:
+            queryset = Category.objects.annotate(
+                num_products=Count("product_set")
+            ).order_by("-num_products")
         return queryset
 
 

@@ -8,8 +8,19 @@ from datetime import timedelta
 import requests
 from django.conf import settings
 from django.core.exceptions import ValidationError
+import uuid
 
 # Create your models here.
+
+
+class TimeStampedUUIDModel(models.Model):
+    pkid = models.BigAutoField(primary_key=True, editable=False)
+    id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
 
 
 class Category(MPTTModel):
@@ -137,6 +148,7 @@ class Product(models.Model):
     documents = models.ManyToManyField(
         ProductDocument, blank=True, related_name="product"
     )
+    views = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.name) if self.name else ""
@@ -190,3 +202,17 @@ class CurrencyRates(models.Model):
             # If you're trying to create a new instance and one already exists
             raise ValidationError("There is can be only one CurrentRates instance")
         return super(CurrencyRates, self).save(*args, **kwargs)
+
+
+class ProductViews(TimeStampedUUIDModel):
+    ip = models.CharField(verbose_name=_("IP Address"), max_length=250)
+    product = models.ForeignKey(
+        Product, related_name="product_views", on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"Total views on - {self.product.name} is - {self.product.views} view(s)"
+
+    class Meta:
+        verbose_name = "Total Views on Product"
+        verbose_name_plural = "Total Product Views"
