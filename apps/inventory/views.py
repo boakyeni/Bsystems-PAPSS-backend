@@ -63,7 +63,7 @@ class SearchProduct(generics.ListAPIView):
             queryset = Product.objects.filter(seller=company_id)
             print("here1")
         elif top:
-            queryset = Product.objects.all().order_by("-views")
+            queryset = Product.objects.all().order_by("-views")[:4]
             print("here2")
         return queryset
 
@@ -192,7 +192,7 @@ class SearchCategories(generics.ListAPIView):
         if top:
             queryset = Category.objects.annotate(
                 num_products=Count("product_set")
-            ).order_by("-num_products")
+            ).order_by("-num_products")[:4]
         return queryset
 
 
