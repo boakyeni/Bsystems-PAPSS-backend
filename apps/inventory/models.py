@@ -157,6 +157,7 @@ class Product(models.Model):
 class CurrencyRates(models.Model):
     currency_rate_timestamp = models.DateTimeField()
     ghs = models.FloatField(default=1.0, blank=True, null=True)
+    tzs = models.FloatField(default=1.0, blank=True, null=True)
     xof = models.FloatField(default=1.0, blank=True, null=True)
     xaf = models.FloatField(default=1.0, blank=True, null=True)
     ngn = models.FloatField(default=1.0, blank=True, null=True)
@@ -171,12 +172,13 @@ class CurrencyRates(models.Model):
                     "http://api.exchangeratesapi.io/v1/latest",
                     params={
                         "access_key": settings.EXCHANGE_RATE_API_KEY,
-                        "symbols": "GHS,XOF,NGN,USD,LRD,GMD,CVE,GNF,MRU,XAF,CDF,AOA,RWF,BIF,STN,ZAR,NAD,BWP,KES",
+                        "symbols": "GHS,XOF,TZS,NGN,USD,LRD,GMD,CVE,GNF,MRU,XAF,CDF,AOA,RWF,BIF,STN,ZAR,NAD,BWP,KES",
                     },
                 )
                 data = response.json()
                 if data.get("success"):
                     self.ghs = data["rates"].get("GHS", self.ghs)
+                    self.tzs = data["rates"].get("TZS", self.tzs)
                     self.xof = data["rates"].get("XOF", self.xof)
                     self.ngn = data["rates"].get("NGN", self.ngn)
                     self.xaf = data["rates"].get("XAF", self.xaf)
@@ -190,6 +192,7 @@ class CurrencyRates(models.Model):
                 pass
         return {
             "GHS": self.ghs,
+            "TZS": self.tzs,
             "XOF": self.xof,
             "NGN": self.ngn,
             "XAF": self.xaf,
