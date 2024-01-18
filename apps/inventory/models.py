@@ -115,7 +115,7 @@ class Product(models.Model):
         verbose_name=_("product description"),
         help_text=_("format: required"),
     )
-    categories = TreeManyToManyField(Category, blank=True)
+    categories = TreeManyToManyField(Category, blank=True, related_name="products")
     is_active = models.BooleanField(
         unique=False,
         null=False,
