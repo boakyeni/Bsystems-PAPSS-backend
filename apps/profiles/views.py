@@ -13,6 +13,7 @@ from .serializers import (
 )
 from apps.inventory.models import Category
 from utils.fuzzysearch import FuzzySearchFilter
+from django_countries import countries
 
 
 # Create your views here.
@@ -46,7 +47,13 @@ class SearchForCompany(generics.ListAPIView):
 
 @api_view(["GET"])
 def get_all_countries(request):
-    return Response(set(Company.objects.values_list("countries", flat=True)))
+    country_codes = set(Company.objects.values_list("countries", flat=True))
+    countries_dict = dict(countries)
+    country_names_and_codes = [
+        {"country": countries_dict[code], "country_code": code}
+        for code in country_codes
+    ]
+    return Response(country_names_and_codes)
 
 
 @api_view(["PATCH"])
