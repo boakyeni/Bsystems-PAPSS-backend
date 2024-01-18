@@ -10,4 +10,5 @@ urlpatterns = [
     path("upload/", views.upload_document, name="upload_document"),
     path("delete-documents/", views.delete_document, name="delete_document"),
     path("edit-company/", views.update_company, name="edit-company"),
+    path("get-countries/", views.get_all_countries, name="get_countries"),
 ]

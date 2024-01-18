@@ -44,6 +44,11 @@ class SearchForCompany(generics.ListAPIView):
         return queryset
 
 
+@api_view(["GET"])
+def get_all_countries(request):
+    return Response(set(Company.objects.values_list("countries", flat=True)))
+
+
 @api_view(["PATCH"])
 @transaction.atomic
 def update_company(request):
