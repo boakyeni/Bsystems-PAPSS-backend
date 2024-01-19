@@ -57,8 +57,8 @@ class Company(models.Model):
         upload_to=user_directory_path, blank=True, null=True
     )
 
-    # def __str__(self):
-    #     return str(self.company_name) if self.company_name else ""
+    def __str__(self):
+        return self.company_name if self.company_name else ""
 
 
 class ContactPerson(models.Model):
