@@ -156,6 +156,8 @@ class Product(models.Model):
     )
     views = models.IntegerField(default=0)
 
+    unit = models.CharField(max_length=250, blank=True, null=True)
+
     def __str__(self):
         return str(self.name) if self.name else ""
 
