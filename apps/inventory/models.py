@@ -105,7 +105,13 @@ class Product(models.Model):
         verbose_name=_("product name"),
         help_text=_("format: required, max-255"),
     )
-    seller = models.ForeignKey(Company, blank=True, null=True, on_delete=models.CASCADE)
+    seller = models.ForeignKey(
+        Company,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="products",
+    )
     slug = AutoSlugField(populate_from="name", unique=True)
     sku = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(

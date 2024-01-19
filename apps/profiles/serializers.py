@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from django_countries.serializers import CountryFieldMixin
 from phonenumber_field.serializerfields import PhoneNumberField
 from django_countries import countries
+from apps.inventory.serializers import ProductReturnSerializer
+
 
 User = get_user_model()
 
@@ -120,6 +122,38 @@ class CompanySearchSerializer(serializers.ModelSerializer):
             if obj.profile_logo
             else ""
         )
+
+    def get_business_certificate(self, obj):
+        return (
+            "https://www.tradepayafrica.com" + obj.business_certificate.url
+            if obj.business_certificate
+            else ""
+        )
+
+
+class CompanyDetailSerializer(serializers.ModelSerializer):
+    categories = serializers.SerializerMethodField()
+    countries = CountryFullNameField()
+    profile_logo = serializers.SerializerMethodField()
+    business_certificate = serializers.SerializerMethodField()
+    products = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Company
+        fields = "__all__"
+
+    def get_categories(self, obj):
+        return [category.name for category in obj.categories.all()]
+
+    def get_profile_logo(self, obj):
+        return (
+            "https://www.tradepayafrica.com" + obj.profile_logo.url
+            if obj.profile_logo
+            else ""
+        )
+
+    def get_products(self, obj):
+        return ProductReturnSerializer(obj.products.all(), many=True).data
 
     def get_business_certificate(self, obj):
         return (

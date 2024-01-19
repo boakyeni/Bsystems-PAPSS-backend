@@ -41,6 +41,7 @@ class SearchProduct(generics.ListAPIView):
         queryset = Product.objects.all()
         product_id = self.request.query_params.get("id")
         company_id = self.request.query_params.get("company_id")
+        category = self.request.query_params.get("category")
         top = self.request.query_params.get("top")
         limit = self.request.query_params.get("limit")
         if product_id:
@@ -65,8 +66,10 @@ class SearchProduct(generics.ListAPIView):
         elif top:
             queryset = Product.objects.all().order_by("-views")[:4]
         elif limit:
-            print("2121")
             queryset = queryset[: int(limit)]
+        elif category:
+            print(category)
+            queryset = Product.objects.filter(categories__name=category).distinct()
         return queryset
 
 

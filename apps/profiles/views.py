@@ -10,6 +10,7 @@ from .serializers import (
     RepCreateSerializer,
     RepReturnSerializer,
     ProfileDocumentSerializer,
+    CompanyDetailSerializer,
 )
 from apps.inventory.models import Category
 from utils.fuzzysearch import FuzzySearchFilter
@@ -25,6 +26,12 @@ class SearchForCompany(generics.ListAPIView):
         FuzzySearchFilter,
     ]
     search_fields = ["countries", "company_name"]
+
+    def get_serializer_class(self):
+        company_id = self.request.query_params.get("id")
+        if company_id:
+            return CompanyDetailSerializer  # Use a different serializer for company_id
+        return super().get_serializer_class()  # Use the default otherwise
 
     def get_queryset(self):
         category = self.request.query_params.get("category")
