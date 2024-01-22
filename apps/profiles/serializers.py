@@ -94,6 +94,12 @@ class FlexibleCountryField(serializers.Field):
                 return code
         raise serializers.ValidationError("Invalid country name or country code.")
 
+    def to_representation(self, value):
+        # Convert the country code back to a human-readable name
+        if value in dict(countries):
+            return dict(countries).get(value)
+        return value
+
 
 class CompanyCreateSerializer(serializers.ModelSerializer):
     profile_logo = Base64File(required=False)
