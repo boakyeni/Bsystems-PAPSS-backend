@@ -83,9 +83,22 @@ class ContactPersonSerializer(serializers.ModelSerializer):
 """Write Serializer"""
 
 
+class FlexibleCountryField(serializers.Field):
+    def to_internal_value(self, data):
+        # Check if the input is a valid country code
+        if data in dict(countries):
+            return data
+        # Check if the input is a valid country name and convert it to its code
+        for code, name in countries:
+            if data.lower() == name.lower():
+                return code
+        raise serializers.ValidationError("Invalid country name or country code.")
+
+
 class CompanyCreateSerializer(serializers.ModelSerializer):
     profile_logo = Base64File(required=False)
     business_certificate = Base64File(required=False)
+    countries = FlexibleCountryField()
 
     class Meta:
         model = Company

@@ -163,6 +163,21 @@ def edit_product(request):
         product_instance.save()
         # add_categories is not a field in Product so best to remove it from data to be sent to Product
         data.pop("add_categories")
+    if "remove_categories" in data:
+        categories = data["remove_categories"]
+        category_instances = []
+        for category in categories:
+            try:
+                to_add = Category.objects.get(name=category).id
+            except:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        category_instances.append(to_add)
+
+        for category in category_instances:
+            product_instance.categories.remove(category)
+        product_instance.save()
+        # remove_categories is not a field in Product so best to remove it from data to be sent to Product
+        data.pop("remove_categories")
     # Product Document is many to many to Product, so serilize and then add to Product
     if "add_documents" in data:
         documents = data["add_documents"]
