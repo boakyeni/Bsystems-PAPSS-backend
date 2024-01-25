@@ -50,6 +50,8 @@ class UserLogin(APIView):
                     "refresh": str(token),
                     "access": str(token.access_token),
                     "isFirstLogin": isFirstLogin,
+                    "is_super_user": user.is_superuser,
+                    "admin": user.is_staff,
                 }
             )
         else:
