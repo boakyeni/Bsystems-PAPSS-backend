@@ -44,7 +44,7 @@ class SearchForCompany(generics.ListAPIView):
         elif country:
             queryset = Company.objects.filter(countries=country, is_active=True)
         elif company_id:
-            company = Company.objects.filter(id=company_id, is_active=True)
+            company = Company.objects.filter(id=company_id)
             if len(company) > 0:
                 queryset = company
             else:
