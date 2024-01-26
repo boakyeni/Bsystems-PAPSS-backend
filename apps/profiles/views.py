@@ -38,17 +38,19 @@ class SearchForCompany(generics.ListAPIView):
         country = self.request.query_params.get("country")
         company_id = self.request.query_params.get("id")
         if category:
-            queryset = Company.objects.filter(categories__name__in=[category])
+            queryset = Company.objects.filter(
+                categories__name__in=[category], is_active=True
+            )
         elif country:
-            queryset = Company.objects.filter(countries=country)
+            queryset = Company.objects.filter(countries=country, is_active=True)
         elif company_id:
-            company = Company.objects.filter(id=company_id)
+            company = Company.objects.filter(id=company_id, is_active=True)
             if len(company) > 0:
                 queryset = company
             else:
                 queryset = []
         else:
-            queryset = Company.objects.all()
+            queryset = Company.objects.filter(is_active=True)
         return queryset
 
 
