@@ -17,10 +17,13 @@ from rest_framework.views import APIView
 from django.utils.timezone import now
 from datetime import timedelta
 from django.db.models import Count
+from django.contrib.auth import get_user_model
 
 # Create your views here.
 
 from utils.fuzzysearch import FuzzySearchFilter
+
+User = get_user_model()
 
 
 class SearchProduct(generics.ListAPIView):
@@ -38,6 +41,7 @@ class SearchProduct(generics.ListAPIView):
     search_fields = ["name", "description"]
 
     def get_queryset(self):
+        # if superuser queryset equals all, if not qs equals is_active=True
         queryset = Product.objects.filter(is_active=True).order_by("-updated_at")
         product_id = self.request.query_params.get("id")
         company_id = self.request.query_params.get("company_id")
@@ -76,6 +80,20 @@ class SearchProduct(generics.ListAPIView):
                 .distinct()
             )
         return queryset
+
+
+@api_view(["GET"])
+def get_my_products(request):
+    user_instance = User.objects.filter(id=request.user.id)
+    products = []
+    if user_instance[0].admin_profile:
+        for company in user_instance[0].admin_profile.companies.all():
+            products.extend(
+                ProductReturnSerializer(instance=company.products.all(), many=True).data
+            )
+    else:
+        return Response("Must be an admin", status=status.HTTP_401_UNAUTHORIZED)
+    return Response(products, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])

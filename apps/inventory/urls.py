@@ -11,4 +11,5 @@ urlpatterns = [
     path("currency-rates/", views.get_currency_rates, name="get_currency_rates"),
     path("edit-category/", views.edit_category, name="update_category"),
     path("disable-product/", views.disable_product),
+    path("my-products/", views.get_my_products),
 ]
