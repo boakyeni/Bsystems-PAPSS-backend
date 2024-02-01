@@ -38,14 +38,14 @@ class SearchProduct(generics.ListAPIView):
     search_fields = ["name", "description"]
 
     def get_queryset(self):
-        queryset = Product.objects.filter(is_active=True)
+        queryset = Product.objects.filter(is_active=True).order_by("-updated_at")
         product_id = self.request.query_params.get("id")
         company_id = self.request.query_params.get("company_id")
         category = self.request.query_params.get("category")
         top = self.request.query_params.get("top")
         limit = self.request.query_params.get("limit")
         if product_id:
-            product = Product.objects.filter(id=product_id)
+            product = Product.objects.filter(id=product_id).order_by("-updated_at")
             if len(product) > 0:
                 # Update views and prevent spam views
                 x_forwarded_for = self.request.META.get("HTTP_X_FORWARDED_FOR")
@@ -62,14 +62,19 @@ class SearchProduct(generics.ListAPIView):
 
             queryset = product
         elif company_id:
-            queryset = Product.objects.filter(seller=company_id)
+            queryset = Product.objects.filter(
+                seller=company_id, is_active=True
+            ).order_by("-updated_at")
         elif top:
-            queryset = Product.objects.all().order_by("-views")[:4]
+            queryset = Product.objects.filter(is_active=True).order_by("-views")[:4]
         elif limit:
             queryset = queryset[: int(limit)]
         elif category:
-            print(category)
-            queryset = Product.objects.filter(categories__name=category).distinct()
+            queryset = (
+                Product.objects.filter(categories__name=category, is_active=True)
+                .order_by("-updated_at")
+                .distinct()
+            )
         return queryset
 
 
