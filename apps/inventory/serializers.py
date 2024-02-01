@@ -22,6 +22,7 @@ class ProductReturnSerializer(serializers.ModelSerializer):
     seller = serializers.SerializerMethodField(required=False)
     rates = serializers.SerializerMethodField(required=False)
     documents = serializers.SerializerMethodField(required=False)
+    about_company = serializers.SerializerMethodField(required=False)
 
     class Meta:
         model = Product
@@ -29,6 +30,9 @@ class ProductReturnSerializer(serializers.ModelSerializer):
 
     def get_seller(self, obj):
         return obj.seller.company_name if obj.seller else ""
+
+    def get_about_company(self, obj):
+        return obj.seller.about if obj.seller else ""
 
     def get_categories(self, obj):
         return [category.name for category in obj.categories.all()]

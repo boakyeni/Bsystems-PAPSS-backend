@@ -82,16 +82,16 @@ def update_company(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
     # Many to Many require manual updating logic
-    if "add_categories" in data:
-        for category in data["add_categories"]:
+    if "categories" in data:
+        for category in data["categories"]:
             category_list = Category.objects.filter(name=category)
             if len(category_list) > 0:
                 company_instance.categories.add(category_list[0])
-    if "remove_categories" in data:
-        for category in data["remove_categories"]:
-            category_list = Category.objects.filter(name=category)
-            if len(category_list) > 0:
-                company_instance.categories.remove(category_list[0])
+    # if "remove_categories" in data:
+    #     for category in data["remove_categories"]:
+    #         category_list = Category.objects.filter(name=category)
+    #         if len(category_list) > 0:
+    #             company_instance.categories.remove(category_list[0])
     company_instance.save()
     serializer = CompanyCreateSerializer(
         instance=company_instance, data=data, partial=True

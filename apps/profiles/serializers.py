@@ -105,6 +105,7 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     profile_logo = Base64File(required=False)
     business_certificate = Base64File(required=False)
     countries = FlexibleCountryField()
+    categories = serializers.SerializerMethodField()
 
     class Meta:
         model = Company
@@ -117,6 +118,9 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     #     phone = validated_data.pop("contact_phone")
 
     #     User.objects.create()
+
+    def get_categories(self, obj):
+        return [category.name for category in obj.categories.all()]
 
 
 """Read Serializer"""
