@@ -86,6 +86,9 @@ def update_company(request):
         for category in data["categories"]:
             category_list = Category.objects.filter(name=category)
             if len(category_list) > 0:
+                to_remove = company_instance.categories.first()
+                if to_remove:
+                    company_instance.categories.remove(to_remove)
                 company_instance.categories.add(category_list[0])
     # if "remove_categories" in data:
     #     for category in data["remove_categories"]:
@@ -99,6 +102,19 @@ def update_company(request):
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(["PATCH"])
+def disable_company(request):
+    # Make only super users capable of this
+    company_id = request.query_params.get("id")
+    company_instance = Company.objects.filter(id=company_id)
+    if len(company_instance):
+        company_instance[0].is_active = False
+        company_instance[0].save()
+    else:
+        return Response("No company with that id", status=status.HTTP_400_BAD_REQUEST)
+    return Response("company disabled", status=status.HTTP_200_OK)
 
 
 class SearchForRep(generics.ListAPIView):

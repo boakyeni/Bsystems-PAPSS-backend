@@ -10,4 +10,5 @@ urlpatterns = [
     path("categories/", views.SearchCategories.as_view(), name="category_search"),
     path("currency-rates/", views.get_currency_rates, name="get_currency_rates"),
     path("edit-category/", views.edit_category, name="update_category"),
+    path("disable-product/", views.disable_product),
 ]

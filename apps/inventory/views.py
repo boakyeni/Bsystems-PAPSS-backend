@@ -38,7 +38,7 @@ class SearchProduct(generics.ListAPIView):
     search_fields = ["name", "description"]
 
     def get_queryset(self):
-        queryset = Product.objects.all()
+        queryset = Product.objects.filter(is_active=True)
         product_id = self.request.query_params.get("id")
         company_id = self.request.query_params.get("company_id")
         category = self.request.query_params.get("category")
@@ -199,6 +199,19 @@ def edit_product(request):
     product_serializer.save()
 
     return Response(product_serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(["PATCH"])
+def disable_product(request):
+    product_id = request.query_params.get("id")
+    product_instance = Product.objects.filter(id=product_id)
+    print(product_instance)
+    if len(product_instance):
+        product_instance[0].is_active = False
+        product_instance[0].save()
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response({"success": "product disabled"}, status=status.HTTP_200_OK)
 
 
 class SearchCategories(generics.ListAPIView):
