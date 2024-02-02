@@ -42,7 +42,10 @@ class SearchProduct(generics.ListAPIView):
 
     def get_queryset(self):
         # if superuser queryset equals all, if not qs equals is_active=True
-        queryset = Product.objects.filter(is_active=True).order_by("-updated_at")
+        if self.request.user.is_superuser:
+            queryset = Product.objects.filter().order_by("-updated_at")
+        else:
+            queryset = Product.objects.filter(is_active=True).order_by("-updated_at")
         product_id = self.request.query_params.get("id")
         company_id = self.request.query_params.get("company_id")
         category = self.request.query_params.get("category")
