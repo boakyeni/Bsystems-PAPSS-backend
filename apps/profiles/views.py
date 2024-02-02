@@ -54,9 +54,12 @@ class SearchForCompany(generics.ListAPIView):
             else:
                 queryset = []
         else:
-            queryset = Company.objects.filter(is_active=True).order_by(
-                "-registration_date"
-            )
+            if self.request.user.is_staff:
+                queryset = Company.objects.filter().order_by("-registration_date")
+            else:
+                queryset = Company.objects.filter(is_active=True).order_by(
+                    "-registration_date"
+                )
         return queryset
 
 
