@@ -12,4 +12,5 @@ urlpatterns = [
     path("edit-company/", views.update_company, name="edit-company"),
     path("get-countries/", views.get_all_countries, name="get_countries"),
     path("disable-company/", views.disable_company),
+    path("enable-company/", views.enable_company),
 ]

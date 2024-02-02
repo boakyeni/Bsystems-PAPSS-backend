@@ -250,6 +250,19 @@ def disable_product(request):
     return Response({"success": "product disabled"}, status=status.HTTP_200_OK)
 
 
+@api_view(["PATCH"])
+def enable_product(request):
+    product_id = request.query_params.get("id")
+    product_instance = Product.objects.filter(id=product_id)
+    print(product_instance)
+    if len(product_instance):
+        product_instance[0].is_active = True
+        product_instance[0].save()
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response({"success": "product enabled"}, status=status.HTTP_200_OK)
+
+
 class SearchCategories(generics.ListAPIView):
     serializer_class = CategoryReturnSerializer
     filter_backends = [filters.SearchFilter]

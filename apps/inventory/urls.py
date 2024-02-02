@@ -12,4 +12,5 @@ urlpatterns = [
     path("edit-category/", views.edit_category, name="update_category"),
     path("disable-product/", views.disable_product),
     path("my-products/", views.get_my_products),
+    path("enable-product/", views.enable_product),
 ]

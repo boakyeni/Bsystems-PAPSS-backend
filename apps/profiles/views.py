@@ -123,6 +123,19 @@ def disable_company(request):
     return Response("company disabled", status=status.HTTP_200_OK)
 
 
+@api_view(["PATCH"])
+def enable_company(request):
+    # Make only super users capable of this
+    company_id = request.query_params.get("id")
+    company_instance = Company.objects.filter(id=company_id)
+    if len(company_instance):
+        company_instance[0].is_active = True
+        company_instance[0].save()
+    else:
+        return Response("No company with that id", status=status.HTTP_400_BAD_REQUEST)
+    return Response("company enabled", status=status.HTTP_200_OK)
+
+
 class SearchForRep(generics.ListAPIView):
     serializer_class = RepReturnSerializer
     filter_backends = [
