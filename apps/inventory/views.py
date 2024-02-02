@@ -174,8 +174,21 @@ def create_product(request):
 @transaction.atomic
 def edit_product(request):
     data = request.data
-    product_instance = Product.objects.get(id=data["id"])
+    product_id = request.query_params.get("id")
+    product_instance = Product.objects.get(id=product_id)
     # Category must already be in the database
+    if "categories" in data:
+        categories = data["categories"]
+        category_instances = [
+            Category.objects.get(name=category).id for category in categories
+        ]
+        to_remove = product_instance.categories.first()
+        if to_remove:
+            product_instance.categories.remove(to_remove)
+        for category in category_instances:
+            product_instance.categories.add(category)
+        product_instance.save()
+        data.pop("categories")
     if "add_categories" in data:
         categories = data["add_categories"]
         category_instances = [
