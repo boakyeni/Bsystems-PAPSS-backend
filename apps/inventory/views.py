@@ -274,10 +274,13 @@ class SearchCategories(generics.ListAPIView):
     def get_queryset(self):
         queryset = Category.objects.all()
         top = self.request.query_params.get("top")
+        cat_id = self.request.query_params.get("id")
         if top:
             queryset = Category.objects.annotate(
                 num_products=Count("products")
             ).order_by("-num_products")[:4]
+        elif cat_id:
+            queryset = Category.objects.filter(id=cat_id)
         return queryset
 
 
