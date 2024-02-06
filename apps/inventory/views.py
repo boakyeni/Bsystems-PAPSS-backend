@@ -42,7 +42,7 @@ class SearchProduct(generics.ListAPIView):
 
     def get_queryset(self):
         # if superuser queryset equals all, if not qs equals is_active=True
-        if self.request.user.is_superuser:
+        if self.request.user.is_staff or self.request.user.is_superuser:
             queryset = Product.objects.filter().order_by("-updated_at")
         else:
             queryset = Product.objects.filter(is_active=True).order_by("-updated_at")
@@ -315,8 +315,12 @@ class CreateCategory(APIView):
 @transaction.atomic
 def edit_category(request):
     data = request.data
+    category_id = request.query_params.get("id")
     try:
-        category_instance = Category.objects.get(name=data["name"])
+        if category_id:
+            category_instance = Category.objects.get(id=category_id)
+        else:
+            category_instance = Category.objects.get(name=data["name"])
     except Category.DoesNotExist:
         custom_response_data = {
             # customize your response format here
