@@ -1,7 +1,11 @@
 from django.shortcuts import render
 from rest_framework import generics, filters, status, permissions
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    permission_classes,
+    authentication_classes,
+)
 from .models import Company, Rep, ProfileDocument, ContactPerson
 from django.db import transaction
 from .serializers import (
@@ -15,7 +19,7 @@ from .serializers import (
 from apps.inventory.models import Category
 from utils.fuzzysearch import FuzzySearchFilter
 from django_countries import countries
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # Create your views here.
 
@@ -75,20 +79,33 @@ def get_all_countries(request):
 
 
 @api_view(["PATCH"])
+@permission_classes([permissions.IsAuthenticated])
+@authentication_classes([JWTAuthentication])
 @transaction.atomic
 def update_company(request):
     data = request.data
     comp_id = data.get("id", None) or request.query_params.get("id")
     try:
         company_instance = Company.objects.get(id=comp_id)
-    except Company.DoesNotExist:
+        contact_person = ContactPerson.objects.get(user=request.user.id)
+    except Company.DoesNotExist or ContactPerson.DoesNotExist:
         return Response(
             {
-                "error": "No company with this ID",
+                "error": "Either no company with this ID, or unauthorized user",
                 "status": "failed",
-                "message": "No company Found",
+                "message": "Either no company or unauthorized user",
             },
             status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if contact_person not in company_instance.contact_people.all():
+        return Response(
+            {
+                "error": "Not Authorized to edit company",
+                "status": "failed",
+                "message": "Not Authorized to edit company",
+            },
+            status=status.HTTP_401_UNAUTHORIZED,
         )
     # Many to Many require manual updating logic
     if "categories" in data:
@@ -114,6 +131,8 @@ def update_company(request):
 
 
 @api_view(["PATCH"])
+@permission_classes([permissions.IsAdminUser])
+@authentication_classes([JWTAuthentication])
 def disable_company(request):
     # Make only super users capable of this
     company_id = request.query_params.get("id")
@@ -127,6 +146,8 @@ def disable_company(request):
 
 
 @api_view(["PATCH"])
+@permission_classes([permissions.IsAdminUser])
+@authentication_classes([JWTAuthentication])
 def enable_company(request):
     # Make only super users capable of this
     company_id = request.query_params.get("id")

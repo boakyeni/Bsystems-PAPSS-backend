@@ -1,6 +1,10 @@
 from django.shortcuts import render
 from rest_framework import generics, filters, status, permissions
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    permission_classes,
+    authentication_classes,
+)
 from .serializers import (
     ProductReturnSerializer,
     ProductCreateSerializer,
@@ -11,6 +15,7 @@ from .serializers import (
     CategoryReturnSerializer,
 )
 from .models import Product, Category, CurrencyRates, Company, ProductViews
+from apps.profiles.models import ContactPerson
 from rest_framework.response import Response
 from django.db import transaction
 from rest_framework.views import APIView
@@ -18,6 +23,7 @@ from django.utils.timezone import now
 from datetime import timedelta
 from django.db.models import Count
 from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # Create your views here.
 
@@ -86,6 +92,8 @@ class SearchProduct(generics.ListAPIView):
 
 
 @api_view(["GET"])
+@permission_classes([permissions.IsAuthenticated])
+@authentication_classes([JWTAuthentication])
 def get_my_products(request):
     user_instance = User.objects.filter(id=request.user.id)
     products = []
@@ -174,11 +182,23 @@ def create_product(request):
 
 
 @api_view(["PATCH"])
+@permission_classes([permissions.IsAuthenticated])
+@authentication_classes([JWTAuthentication])
 @transaction.atomic
 def edit_product(request):
     data = request.data
     product_id = request.query_params.get("id")
-    product_instance = Product.objects.get(id=product_id)
+    try:
+        product_instance = Product.objects.get(id=product_id)
+        contact_person = ContactPerson.objects.get(user=request.user.id)
+    except Product.DoesNotExist:
+        return Response(
+            {"error": "No product", "status": "failed", "message": "no product"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if product_instance.seller not in contact_person.companies.all():
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
     # Category must already be in the database
     if "categories" in data:
         categories = data["categories"]

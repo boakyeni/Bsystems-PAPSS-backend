@@ -13,6 +13,7 @@ import collections
 from apps.inventory.models import Product
 from datetime import timedelta
 from django.utils.timezone import localtime, now
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class SearchOrder(generics.ListAPIView):
