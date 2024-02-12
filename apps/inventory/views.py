@@ -190,14 +190,17 @@ def edit_product(request):
     product_id = request.query_params.get("id")
     try:
         product_instance = Product.objects.get(id=product_id)
-        contact_person = ContactPerson.objects.get(user=request.user.id)
+        contact_person = ContactPerson.objects.get(user=request.user.id) or request.user
     except Product.DoesNotExist:
         return Response(
             {"error": "No product", "status": "failed", "message": "no product"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    if product_instance.seller not in contact_person.companies.all():
+    if (
+        product_instance.seller not in contact_person.companies.all()
+        or not request.user.is_superuser
+    ):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     # Category must already be in the database
     if "categories" in data:

@@ -87,8 +87,8 @@ def update_company(request):
     comp_id = data.get("id", None) or request.query_params.get("id")
     try:
         company_instance = Company.objects.get(id=comp_id)
-        contact_person = ContactPerson.objects.get(user=request.user.id)
-    except Company.DoesNotExist or ContactPerson.DoesNotExist:
+        contact_person = ContactPerson.objects.get(user=request.user.id) or request.user
+    except Company.DoesNotExist:
         return Response(
             {
                 "error": "Either no company with this ID, or unauthorized user",
@@ -98,7 +98,9 @@ def update_company(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    if contact_person not in company_instance.contact_people.all():
+    if (contact_person not in company_instance.contact_people.all()) or (
+        not request.user.is_superuser
+    ):
         return Response(
             {
                 "error": "Not Authorized to edit company",
