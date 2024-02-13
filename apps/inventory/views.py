@@ -186,6 +186,7 @@ def create_product(request):
 @authentication_classes([JWTAuthentication])
 @transaction.atomic
 def edit_product(request):
+    print(request.user.is_superuser)
     data = request.data
     product_id = request.query_params.get("id")
     try:
@@ -197,9 +198,8 @@ def edit_product(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    if (
-        product_instance.seller not in contact_person.companies.all()
-        or not request.user.is_superuser
+    if (product_instance.seller not in contact_person.companies.all()) and (
+        not request.user.is_superuser
     ):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     # Category must already be in the database

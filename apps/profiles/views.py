@@ -98,7 +98,7 @@ def update_company(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    if (contact_person not in company_instance.contact_people.all()) or (
+    if (contact_person not in company_instance.contact_people.all()) and (
         not request.user.is_superuser
     ):
         return Response(
